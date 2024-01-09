@@ -1,0 +1,227 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const sql = require('mssql');
+const app = express();
+const port = 3000;
+const path = require('path');
+
+app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
+//https://www.youtube.com/watch?v=CUQAt1xfUWI
+app.use(express.static(path.join(__dirname, 'public1')))
+
+const config = require('./config');
+const databaseConfig = config.database;
+
+// CREATE
+async function insertData() {
+  app.post('/create', async (req, res) => {
+    const 作曲家c = req.body.作曲家c;
+    const 曲名 = req.body.曲名;
+    const 指揮 = req.body.指揮;
+    const 樂團 = req.body.樂團;
+    const 獨奏家 = req.body.獨奏家;
+    const 唱片公司 = req.body.唱片公司;
+    const 嵌入網址 = req.body.嵌入網址;
+    const 網址 = req.body.網址;
+
+    try {
+        await sql.connect(config);
+        const request = new sql.Request();
+        const insertQuery = `INSERT INTO ${作曲家c} (曲名, 指揮, 樂團, 獨奏家, 唱片公司, 嵌入網址, 網址) VALUES ('${曲名}', '${指揮}', '${樂團}', '${獨奏家}', '${唱片公司}', '${嵌入網址}', '${網址}')`;
+        const result = await request.query(insertQuery);
+        console.log('加入成功:', result);
+        res.send('加入成功');
+    } catch (err) {
+        console.error('加入失敗:', err);
+        res.status(500).send('加入失敗');
+    } finally {
+        sql.close();
+    }
+  });
+
+}
+// READ
+async function readData(tableName) {
+  try {
+    await sql.connect(config);
+    const request = new sql.Request();
+    const selectQuery = `SELECT * FROM ${tableName} ORDER BY 曲名`;
+    const result = await request.query(selectQuery);
+    console.log('資料讀取成功:', result.recordset);
+    return result.recordset;
+  } catch (err) {
+    console.error('資料讀取失敗:', err);
+    return err;
+  } finally {
+    sql.close();
+  }
+}
+
+
+// UPDATE
+async function updateData() {
+  app.post('/update', async (req, res) => {
+    const 作曲家u = req.body.作曲家u;
+    const 欄位 = req.body.欄位;
+    const 想改什麼 = req.body.想改什麼;
+    const 網址ToUpdate = req.body.網址ToUpdate;
+  
+    try {
+        await sql.connect(config);
+        const request = new sql.Request();
+        const updateQuery = `UPDATE ${作曲家u} SET ${欄位} = '${想改什麼}' WHERE 網址 = '${網址ToUpdate}'`;
+        const result = await request.query(updateQuery);
+        console.log('更新成功:', result);
+        //res.redirect('/'); // 回首頁
+        res.send('更新成功');
+    } catch (err) {
+        console.error('更新失敗:', err);
+        res.render('error', { error: '更新失敗' });
+    } finally {
+        sql.close();
+    }
+  });
+}
+// DELETE
+async function deleteData() {
+  app.post('/delete', async (req, res) => {
+    const 作曲家d = req.body.作曲家d;
+    const 網址 = req.body.網址;
+
+    try {
+        await sql.connect(config);
+        const request = new sql.Request();
+        const deleteQuery = `DELETE FROM ${作曲家d} WHERE 網址 = '${網址}'`;
+        const result = await request.query(deleteQuery);
+        console.log('刪除成功:', result);
+        res.send('刪除成功');
+    } catch (err) {
+        console.error('刪除失敗:', err);
+        res.status(500).send('刪除失敗');
+    } finally {
+        sql.close();
+    }
+});
+}
+/*
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
+
+//login
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Connect to SQL Server
+    await sql.connect(config);
+
+    // Query to check if the username and password match
+    const result = await sql.query`SELECT * FROM Users WHERE username = ${username} AND password = ${password}`;
+
+    if (result.recordset.length > 0) {
+      // Successful login
+      req.session.username = username;
+      req.session.message = '';
+      res.redirect('/');
+    } else {
+      // Failed login
+      req.session.message = 'Invalid username or password';
+      res.redirect('/login');
+    }
+  } catch (error) {
+    console.error(error.message);
+    req.session.message = 'An error occurred';
+    res.redirect('/login');
+  } finally {
+    // Close SQL Server connection
+    await sql.close();
+  }
+});
+*/
+/*
+app.get('/other2', (req, res) => {
+  res.render('file2');
+});
+*/
+app.use(express.static('static'));
+
+app.post('/crud', async (req, res) => {
+    operation = req.body.operation;
+    let resultMessage = '';
+    switch (operation) {
+      case 'c':
+        await insertData();
+        resultMessage = '加入成功';
+        break;
+      case 'r':
+        const tableName = req.body.tableName;
+        data = await readData(tableName);
+        resultMessage = '讀取成功';
+        break;
+      case 'u':
+        await updateData();
+        resultMessage = '更新成功';
+        break;
+      case 'd':
+        await deleteData();
+        resultMessage = '刪除成功';
+        break;
+      default:
+        resultMessage = '錯誤指令';
+    }
+    res.render('index', { resultMessage });
+});
+
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
+});
+app.get('/delete', (req, res) => {
+  res.render('delete');
+});
+
+app.get('/', (req, res) => {
+  res.render('index');
+});
+
+app.get('/news', (req, res) => {
+  res.render('news');
+});
+
+app.get('/blog', (req, res) => {
+  res.render('blog');
+});
+
+app.get('/about', (req, res) => {
+  res.render('about');
+});
+
+/*輸入crud
+<form method="POST" action="/crud">
+  <label for="operation">輸入crud: </label>
+  <input type="text" id="operation" name="operation" required pattern="[cC|rR|uU|dD]" title="Enter c, r, u, or d">
+  <button type="submit">Submit</button>
+</form>
+*/
+
+
+/* 輸入作曲家
+<form method="POST" action="/crud">
+  <input type="hidden" name="operation" value="r">
+  <label for="tableName">輸入作曲家:</label>
+  <input type="text" id="tableName" name="tableName" required>
+  <button type="submit">提交</button>
+</form>
+*/
+
+/*
+<div>
+    <form method="POST" action="/login" style="float: right;">
+      <a href = "/login">登入<a>
+    </form>
+  </div>
+  
+*/

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRUD Operations</title>
+</head>
+<body>
+  <style>
+    .custom-link {
+      text-decoration: none; /* 去掉底線 */
+      color: inherit; /* 使用元素的原始文字顏色 */
+    }
+  
+    .custom-link:hover {
+      border-bottom: none; /* 移除底線 */
+    }
+  </style>
+
+  <div style="margin-left: 20px;">
+    <h1><a class="custom-link" href="http://localhost:3000">Henry's Select</a></h1>
+  </div>
+
+  <!--<a href="/other2">Go to Other Page</a>-->
+
+  <div style="margin-left: 20px;">
+    <form method="POST" action="/crud">
+      <button type="submit" name="operation" value="r">唱片</button>
+      <button type="submit" name="operation" value="c">新增唱片</button>
+      <button type="submit" name="operation" value="u">更新唱片</button>
+      <button type="submit" name="operation" value="d">刪除唱片</button>
+    </form>
+
+    <form method="POST" action="/login">
+      <a href = "/">登出<a>
+    </form>
+  </div>
+  
+  <% if (typeof resultMessage !== 'undefined' && resultMessage !== '') { %>
+    
+    <% if (operation === 'r') { %>
+      <p></p>
+      <p></p>
+
+      <div style="margin-left: 20px;">
+        <form method="POST" action="/crud">
+          <input type="hidden" name="operation" value="r">
+          <label>選擇作曲家:</label>
+          <!-- 使用 6 個按鈕分別對應不同的作曲家 -->
+          <button type="submit" name="tableName" value="Beethoven">Beethoven</button>
+          <button type="submit" name="tableName" value="Mahler">Mahler</button>
+          <button type="submit" name="tableName" value="Richard_Strauss">Richard Strauss</button>
+          <button type="submit" name="tableName" value="Tchaikovsky">Tchaikovsky</button>
+          <button type="submit" name="tableName" value="Bruckner">Bruckner</button>
+          <button type="submit" name="tableName" value="Sibelius">Sibelius</button>
+          <button type="submit" name="tableName" value="Chopin">Chopin</button>
+        </form>
+      </div>
+      <% if (data && data.length > 0) { %>
+        <p></p>
+        <div style="margin-left: 50px;">
+          <h2>Result:</h2>
+        </div>
+        <% data.forEach(item => { %>
+          <div style="margin-left: 50px;">
+            <div style="width: 550px; display: inline-block; vertical-align: middle;">
+              <h2><%= item.曲名 %></h2>
+              <p>指揮: <%= item.指揮 %></p>
+              <p>樂團: <%= item.樂團 %></p>
+              <p>獨奏家: <%= item.獨奏家 %></p>
+              <p>唱片公司: <%= item.唱片公司 %></p>
+              <p>網址: <a href="<%= item.網址 %>"><%= item.網址 %></a></p>
+            </div>
+  
+            <div style="width: 400px; display: inline-block; vertical-align: middle;">
+              <iframe width="385" height="240" src="<%= item.嵌入網址 %>" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+          </div>
+          <div></div>
+          <br>
+        <% }); %>
+      <% } %>
+
+    <% } else if (operation === 'c') { %>
+      <p></p>
+      <p></p>
+      <form method="post" action="/create">
+        <div style="margin-left: 20px;">
+
+          <label for="作曲家c">作曲家:</label>
+          <select id="作曲家c" name="作曲家c" required>
+            <option value=""></option>
+            <option value="Beethoven">Beethoven</option>
+            <option value="Mahler">Mahler</option>
+            <option value="Richard_Strauss">Richard Strauss</option>
+            <option value="Tchaikovsky">Tchaikovsky</option>
+            <option value="Bruckner">Bruckner</option>
+            <option value="Sibelius">Sibelius</option>
+            <option value="Chopin">Chopin</option>
+          </select>
+
+          <label for="曲名">曲名:</label>
+          <input type="text" id="曲名" name="曲名" required>
+      
+          <label for="指揮">指揮:</label>
+          <input type="text" id="指揮" name="指揮">
+    
+          <label for="樂團">樂團:</label>
+          <input type="text" id="樂團" name="樂團">
+        </div>
+        <div></div>
+        <p></p>
+
+        <div style="margin-left: 20px;">
+          <label for="獨奏家">獨奏家:</label>
+          <input type="text" id="獨奏家" name="獨奏家">
+
+          <label for="唱片公司">唱片公司:</label>
+          <input type="text" id="唱片公司" name="唱片公司">
+    
+          <label for="嵌入網址">嵌入網址:</label>
+          <input type="text" id="嵌入網址" name="嵌入網址" required>
+
+          <label for="網址">網址:</label>
+          <input type="text" id="網址" name="網址" required>
+    
+          <button type="submit">新增</button>
+      </div>
+      </form>
+
+    <% } else if (operation === 'u') { %>
+      <p></p>
+      <p></p>
+      <form method="POST" action="/update">
+        <div style="margin-left: 20px;">
+          <label for="作曲家u">作曲家:</label>
+          <select id="作曲家u" name="作曲家u" required>
+            <option value=""></option>
+            <option value="Beethoven">Beethoven</option>
+            <option value="Mahler">Mahler</option>
+            <option value="Richard_Strauss">Richard Strauss</option>
+            <option value="Tchaikovsky">Tchaikovsky</option>
+            <option value="Bruckner">Bruckner</option>
+            <option value="Sibelius">Sibelius</option>
+            <option value="Chopin">Chopin</option>
+          </select>
+
+          <label for="欄位">欄位</label>
+          <select id="欄位" name="欄位" required>
+            <option value=""></option>
+            <option value="曲名">曲名</option>
+            <option value="指揮">指揮</option>
+            <option value="樂團">樂團</option>
+            <option value="獨奏家">獨奏家</option>
+            <option value="唱片公司">唱片公司</option>
+            <option value="嵌入網址">嵌入網址</option>
+            <option value="網址">網址</option>
+          </select>
+    
+          <label for="想改什麼">想改什麼：</label>
+          <input type="text" id="想改什麼" name="想改什麼" required>
+
+          <label for="網址ToUpdate">網址：</label>
+          <input type="text" id="網址ToUpdate" name="網址ToUpdate" required>
+    
+        <button type="submit">更新</button>
+        </div>
+      </form>
+    
+    <% } else if (operation === 'd') { %>
+      <p></p>
+      <p></p>
+      <form method="post" action="/delete">
+        <div style="margin-left: 20px;">
+          <label for="作曲家d">作曲家:</label>
+          <select id="作曲家d" name="作曲家d" required>
+            <option value=""></option>
+            <option value="Beethoven">Beethoven</option>
+            <option value="Mahler">Mahler</option>
+            <option value="Richard_Strauss">Richard Strauss</option>
+            <option value="Tchaikovsky">Tchaikovsky</option>
+            <option value="Bruckner">Bruckner</option>
+            <option value="Sibelius">Sibelius</option>
+            <option value="Chopin">Chopin</option>
+          </select>
+
+          <label for="網址">網址:</label>
+          <input type="text" id="網址" name="網址" required>
+        
+          <button type="submit">刪除</button>
+        </div>
+    </form>
+
+    <% } else { %>
+      <p>錯誤</p>
+    <% } %>
+  <% } %>
+  
+</body>
+</html>
