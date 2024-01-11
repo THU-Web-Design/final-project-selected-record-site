@@ -1,1 +1,32 @@
+1.
+web_final_project的config格式為
+
+const config = {
+    server: 'xxx',
+    database: 'xxx',
+    user: 'xxx',
+    password: 'xxx',
+    options: {
+      encrypt: false,
+    },
+  };
+  
+module.exports = config;
+
+2.
+創建資料表範例
+
+Create table Beethoven
+(
+	曲名 nvarchar(100),
+	指揮 nvarchar(100),
+	樂團 nvarchar(100),
+	獨奏家 nvarchar(100),
+	唱片公司 nvarchar(100),
+	嵌入網址 nvarchar(255),
+	網址 nvarchar(255),
+	primary key(網址)
+)
+
+3.
 執行web_final_project
